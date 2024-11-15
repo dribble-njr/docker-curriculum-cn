@@ -4,3 +4,5 @@ tutorial/public/index.html
 tutorial/public/styles/dist/*
 tutorial/src/styles/dist/*
 .vscode
+docs/.vitepress/cache
+docs/.vitepress/dist
