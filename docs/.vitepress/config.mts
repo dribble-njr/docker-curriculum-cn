@@ -3,6 +3,7 @@ import { defineConfig } from "vitepress";
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: "docker-curriculum-cn",
+  base: '/docker-curriculum-cn',
   description: "docker 基础教程",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
