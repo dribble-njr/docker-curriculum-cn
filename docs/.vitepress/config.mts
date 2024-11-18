@@ -21,7 +21,7 @@ export default defineConfig({
         base: "/beginner/",
         items: [
           { text: "介绍", link: "01-introduction" },
-          { text: "安装", link: "02-installation" },
+          { text: "开始", link: "02-getting-started" },
           { text: "Docker 基础", link: "03-docker-basics" },
           { text: "Docker 命令", link: "04-docker-commands" },
           { text: "Docker 镜像", link: "05-docker-images" },
