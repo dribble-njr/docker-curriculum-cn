@@ -22,7 +22,7 @@ export default defineConfig({
         items: [
           { text: "介绍", link: "01-introduction" },
           { text: "开始", link: "02-getting-started" },
-          { text: "Docker 基础", link: "03-docker-basics" },
+          { text: "Hello World", link: "03-hello-world" },
           { text: "Docker 命令", link: "04-docker-commands" },
           { text: "Docker 镜像", link: "05-docker-images" },
           { text: "Docker 容器", link: "06-docker-containers" },
