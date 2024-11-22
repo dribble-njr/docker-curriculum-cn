@@ -9,4 +9,4 @@ Fork 自 [docker-curriculum](https://github.com/prakhar1989/docker-curriculum)�
 
 感谢 [prakhar1989](https://github.com/prakhar1989) 的教程。
 
-翻译版本中「我」均指代 [prakhar1989](https://github.com/prakhar1989)。
+翻译版本中「我」均指代 [@prakhar1989](https://github.com/prakhar1989)。
