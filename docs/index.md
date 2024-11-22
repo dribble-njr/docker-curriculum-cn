@@ -8,14 +8,11 @@ hero:
   image:
     src: /assets/images/logo.png
     alt: docker logo
-  tagline: docker for beginners
+  tagline: 学习如何使用 docker 构建和部署分布式应用程序
   actions:
     - theme: brand
       text: 开始学习
       link: /beginner/01-introduction
-    - theme: alt
-      text: API Examples
-      link: /api-examples
 
 features:
   - title: Feature A

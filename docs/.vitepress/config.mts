@@ -15,6 +15,10 @@ export default defineConfig({
       { text: "基础教程", link: "/beginner/01-introduction" },
     ],
 
+    outline: {
+      level: [2, 4], // 显示 h2 到 h4 的标题
+    },
+
     sidebar: [
       {
         text: "基础教程",
@@ -23,7 +27,7 @@ export default defineConfig({
           { text: "介绍", link: "01-introduction" },
           { text: "开始", link: "02-getting-started" },
           { text: "Hello World", link: "03-hello-world" },
-          { text: "Docker 命令", link: "04-docker-commands" },
+          { text: "使用 Docker 的 Web 应用", link: "04-webapps-with-docker" },
           { text: "Docker 镜像", link: "05-docker-images" },
           { text: "Docker 容器", link: "06-docker-containers" },
         ],
@@ -31,7 +35,10 @@ export default defineConfig({
     ],
 
     socialLinks: [
-      { icon: "github", link: "https://github.com/vuejs/vitepress" },
+      {
+        icon: "github",
+        link: "https://github.com/dribble-njr/docker-curriculum-cn",
+      },
     ],
   },
 });
