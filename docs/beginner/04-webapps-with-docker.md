@@ -261,7 +261,7 @@ Login Succeeded
 > [!NOTE]
 > 华为云的 [SWR](https://console.huaweicloud.com/swr/?region=cn-north-4#/swr/dashboard) 提供了与 Docker Hub 类似的服务。
 > 
-> ![华为云 SWR 登录](https://raw.githubusercontent.com/dribble-njr/typora-njr/master/img/20241122225624.png)
+> ![华为云 SWR 登录](https://raw.githubusercontent.com/dribble-njr/typora-njr/master/img/20241122234150.png)
 
 要发布，只需键入下面的命令，记住要将上面的镜像标签名称替换为您的名称。重要的是要使用 `yourusername/image_name` 的格式，这样客户端才能知道要在哪里发布。
 
