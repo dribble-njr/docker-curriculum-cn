@@ -24,7 +24,7 @@ VMs 为应用程序提供了完整的进程隔离：很少有方法可以影响�
 
 从运营的角度来看，除了可移植性之外，容器还提供了对资源的更细粒度的控制，从而提高了基础设施的效率，可以更好地利用计算资源。
 
-![Google Trends for Docker](https://d33wubrfki0l68.cloudfront.net/7ab09bbf5dbd56cffdddd1ae653395053a985228/7b180/images/interest.png)
+![Google Trends for Docker](/assets/images/interest.webp)
 
 由于这些好处，容器（和 Docker）已经得到了广泛的应用。如 Google、Facebook、Netflix 和 Salesforce 等公司利用容器来提高大型工程团队的生产力，并改善计算资源的利用。
 
