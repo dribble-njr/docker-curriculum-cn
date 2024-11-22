@@ -24,10 +24,13 @@ VMs 为应用程序提供了完整的进程隔离：很少有方法可以影响�
 
 从运营的角度来看，除了可移植性之外，容器还提供了对资源的更细粒度的控制，从而提高了基础设施的效率，可以更好地利用计算资源。
 
+![Google Trends for Docker](https://d33wubrfki0l68.cloudfront.net/7ab09bbf5dbd56cffdddd1ae653395053a985228/7b180/images/interest.png)
+
 由于这些好处，容器（和 Docker）已经得到了广泛的应用。如 Google、Facebook、Netflix 和 Salesforce 等公司利用容器来提高大型工程团队的生产力，并改善计算资源的利用。
 
 ## 我将学到什么？
 
 本教程旨在成为 Docker 的实践指南。除了揭开 Docker 的神秘面纱外，它还将为您提供构建和部署自己的 Web 应用程序的实践经验。我们将使用 [Amazon Web Services](http://aws.amazon.com) 在 [EC2](https://aws.amazon.com/ec2/) 上部署一个静态网站，并使用 [Elastic Beanstalk](https://aws.amazon.com/elasticbeanstalk/) 和 [Elastic Container Service](https://aws.amazon.com/ecs/) 在 [EC2](https://aws.amazon.com/ec2/) 上部署两个动态 Web 应用程序。即使您不熟悉 AWS，也不用担心——本教程将引导您完成所有步骤。
 
+> [!NOTE]
 > 该翻译版本将在 [华为云](https://www.huaweicloud.com/) 上部署。

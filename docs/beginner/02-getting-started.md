@@ -36,7 +36,7 @@ This message shows that your installation appears to be working correctly.
 ```
 
 > [!TIP]
-> 译者注：这条命令会下载一个测试镜像，并在一个容器中运行。当容器运行时，它会打印一条确认信息并退出。
+> 这条命令会下载一个测试镜像，并在一个容器中运行。当容器运行时，它会打印一条确认信息并退出。
 
 > [!TIP]
 > 国内用户可能需要配置 Docker 的镜像源，请参考 [Docker 镜像源配置](https://gist.github.com/y0ngb1n/7e8f16af3242c7815e7ca2f0833d3ea6)。
