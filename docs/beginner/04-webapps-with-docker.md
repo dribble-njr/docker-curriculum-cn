@@ -196,6 +196,9 @@ CMD ["python", "./app.py"]
 $ docker build -t flask-app .
 ```
 
+> [!TIP]
+> `-t` 标志用于指定镜像的标签名。`.` 让 Docker 知道哪个目录（当前目录）包含 `Dockerfile`。
+
 下面的部分显示了运行相同命令的输出结果。在你自己运行该命令之前（别忘了句号），确保将我的用户名替换为你的用户名。这个用户名应该是你在 [Docker hub](https://hub.docker.com/) 注册时创建的用户名。如果你还没有注册，请继续创建一个账户。 `docker build` 命令非常简单，它需要一个带 `-t` 的可选标签名和包含 `Dockerfile` 的目录位置。
 
 ```bash
@@ -300,13 +303,72 @@ $ docker run -p 8888:5000 yourusername/catnip
 ```
 
 > [!TIP]
-> 拉取镜像的过程
+> 启动镜像的过程
 > 
 > 1. 检查本地是否存在镜像： Docker 首先会检查是否有匹配的镜像（yourusername/catnip），包括是否匹配指定的标签（默认为 latest）。
-> 2. 本地无镜像时拉取： 如果本地没有该镜像，Docker 会尝试从远程仓库拉取：
+> 2. 本地无镜像时拉取：如果本地没有该镜像，Docker 会尝试从远程仓库拉取：
 >    - 默认仓库是 Docker Hub。
 >    - 如果镜像名中包含自定义仓库地址（如 `swr.cn-north-4.myhuaweicloud.com`），则会从指定的仓库拉取。
-> 3. 运行容器： 镜像下载完成后，Docker 会立即启动该镜像并创建容器。
+> 3. 运行容器：镜像下载完成后，Docker 会立即启动该镜像并创建容器。
 
 如果你过去曾为设置本地开发环境/共享应用程序配置而头疼不已，你就会非常清楚这听起来有多棒。这就是为什么 Docker 如此酷的原因！
 
+### Beanstalk
+
+> [!NOTE]
+> 若在前文使用了云服务器进行部署，则可以跳过以下内容。
+
+AWS Elastic Beanstalk（EB）是 AWS 提供的 PaaS（平台即服务）。如果你使用过 Heroku、Google App Engine 等，你就会有熟悉的感觉。作为开发人员，您只需告诉 EB 如何运行您的应用程序，剩下的事情就交给它了，包括扩展、监控甚至更新。2014 年 4 月，EB 增加了对运行单容器 Docker 部署的支持，这就是我们将用来部署应用程序的方法。 虽然 EB 有一个非常直观的 [CLI](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb-cli3.html)，但它确实需要一些设置，为了保持简单，我们将使用 Web UI 来启动我们的应用程序。
+
+要继续学习，您需要一个正常运行的 [AWS 账户](https://aws.amazon.com/)。如果您还没有，请现在就注册--您需要输入信用卡信息。不过别担心，这是免费的，我们在本教程中所做的任何事情也都是免费的！让我们开始吧。
+
+步骤如下：
+
+- Login to your AWS [console](http://console.aws.amazon.com).
+- Click on Elastic Beanstalk. It will be in the compute section on the top left. Alternatively, you can access the [Elastic Beanstalk console](https://console.aws.amazon.com/elasticbeanstalk).
+   ![EB Start](/assets/images/eb-start.webp)
+- Click on "Create New Application" in the top right
+- Give your app a memorable (but unique) name and provide an (optional) description
+- In the **New Environment** screen, create a new environment and choose the **Web Server Environment**.
+- Fill in the environment information by choosing a domain. This URL is what you'll share with your friends so make sure it's easy to remember.
+- Under base configuration section. Choose _Docker_ from the _predefined platform_.
+   ![EB Docker](/assets/images/eb-docker.webp)
+- Now we need to upload our application code. But since our application is packaged in a Docker container, we just need to tell EB about our container. Open the `Dockerrun.aws.json` [file](https://github.com/prakhar1989/docker-curriculum/blob/master/flask-app/Dockerrun.aws.json) located in the `flask-app` folder and edit the `Name` of the image to your image's name. Don't worry, I'll explain the contents of the file shortly. When you are done, click on the radio button for "Upload your Code", choose this file, and click on "Upload".
+- Now click on "Create environment". The final screen that you see will have a few spinners indicating that your environment is being set up. It typically takes around 5 minutes for the first-time setup.
+
+在等待的过程中，让我们快速了解一下 `Dockerrun.aws.json` 文件的内容。这个文件基本上是 AWS 的专用文件，它告诉 EB 有关我们的应用程序和 docker 配置的详细信息。
+
+```json
+{
+  "AWSEBDockerrunVersion": "1",
+  "Image": {
+    "Name": "prakhar1989/catnip",
+    "Update": "true"
+  },
+  "Ports": [
+    {
+      "ContainerPort": 5000,
+      "HostPort": 8000
+    }
+  ],
+  "Logging": "/var/log/nginx"
+}
+```
+
+该文件不言自明，但你也可以 [参考官方文档了解更多信息](http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create_deploy_docker_image.html#create_deploy_docker_image_dockerrun)。我们提供了 EB 应使用的映像名称以及容器应打开的端口。
+
+![EB Deploy](/assets/images/eb-deploy.webp)
+
+继续在浏览器中打开 URL，你就会看到应用程序的全貌。欢迎将此链接通过电子邮件、即时消息或 snapchat 发送给您的亲朋好友，让他们也能欣赏到一些猫咪 gif。
+
+### 清理
+
+完成之后，记得终止环境，以免产生不必要的费用。
+
+![EB terminate](/assets/images/eb-terminate.webp)
+
+恭喜！你已经成功部署了第一个 Docker 应用程序！虽然看起来有很多步骤，但使用 EB 部署 Docker 应用确实非常简单。
+
+恭喜您，您已经部署了第一个 Docker 应用程序！这看似步骤繁多，但有了 [EB 命令行工具](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb-cli3.html)，你几乎只需敲几下键盘就能模仿 Heroku 的功能！希望您同意，Docker 为您省去了在云中构建和部署应用程序的许多麻烦。我建议您阅读 AWS 关于单容器 Docker 环境的 [文档](http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/docker-singlecontainer-deploy.html)，以了解现有的功能。
+
+在本教程的下一部分（也是最后一部分），我们将更进一步，部署一个更接近真实世界的应用程序；一个具有持久后端存储层的应用程序。 让我们直奔主题！
