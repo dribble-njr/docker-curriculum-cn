@@ -291,7 +291,7 @@ $ docker push yourusername/catnip
 > docker push swr.cn-north-4.myhuaweicloud.com/njr/catnip:latest
 > ```
 
-完成后，你就可以在 Docker Hub 上查看你的镜像了。例如，这里就是[我的镜像的网页](https://hub.docker.com/r/prakhar1989/catnip/)。
+完成后，你就可以在 Docker Hub 上查看你的镜像了。例如，这里就是 [我的镜像的网页](https://hub.docker.com/r/prakhar1989/catnip/)。
 
 > [!NOTE]
 > 在我们继续之前，我想说明的一点是，为了部署到 AWS，并不是一定要将映像托管在公共注册表（或任何注册表）上。如果你正在为下一个价值百万美元的独角兽初创公司编写代码，你完全可以跳过这一步。我们之所以公开推送我们的镜像，是因为它跳过了一些中间配置步骤，使部署变得超级简单。
