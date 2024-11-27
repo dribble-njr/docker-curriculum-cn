@@ -176,3 +176,16 @@ Out of retries. Bailing out...
 
 哎呀！我们的 flask 应用程序无法运行，因为它无法连接到 Elasticsearch。我们该如何让一个容器了解另一个容器，并让它们相互对话呢？答案就在下一节。
 
+## Docker 网络
+
+在讨论 Docker 专门为处理此类情况而提供的功能之前，让我们先来看看能否找到一种方法来解决这个问题。希望这能让你对我们将要学习的特定功能有所了解。
+
+好了，让我们运行 `docker container ls`（与 `docker ps` 相同），看看有什么。
+
+```bash
+$ docker container ls
+CONTAINER ID        IMAGE                                                 COMMAND                  CREATED             STATUS              PORTS                                            NAMES
+277451c15ec1        docker.elastic.co/elasticsearch/elasticsearch:6.3.2   "/usr/local/bin/dock…"   17 minutes ago      Up 17 minutes       0.0.0.0:9200->9200/tcp, 0.0.0.0:9300->9300/tcp   es
+```
+
+因此，我们有一个 ES 容器运行在 0.0.0.0:9200 端口上，我们可以直接访问它。如果我们能让 Flask 应用程序连接到这个 URL，它就能与 ES 进行连接和对话了，对吗？让我们深入 [Python 代码](https://github.com/prakhar1989/FoodTrucks/blob/master/flask-app/app.py#L7)，看看如何定义连接细节。
