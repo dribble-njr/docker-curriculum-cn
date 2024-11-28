@@ -671,3 +671,136 @@ $ docker network inspect foodtrucks_default
     }
 ]
 ```
+
+## 开发工作流
+
+在跳转到下一节之前，我还想介绍一下关于 docker-compose 的最后一件事。如前所述，docker-compose 对开发和测试来说真的很重要。因此，让我们看看在开发过程中如何配置编译，让我们的生活更轻松。
+
+在本教程中，我们一直在使用现成的 docker 镜像。虽然我们已经从头开始构建了镜像，但我们还没有接触过任何应用程序代码，主要限于编辑 Dockerfile 和 YAML 配置。你一定想知道开发过程中的工作流程是怎样的？是不是每次更改都要不断创建 Docker 镜像，然后发布，然后运行，看看更改是否达到预期效果？我敢肯定，这听起来超级乏味。一定有更好的办法。在本节中，我们将探讨这个问题。
+
+让我们看看如何更改刚刚运行的 Foodtrucks 应用程序。确保应用程序正在运行。
+
+```bash
+$ docker container ls
+CONTAINER ID        IMAGE                                                 COMMAND                  CREATED             STATUS              PORTS                              NAMES
+5450ebedd03c        yourusername/foodtrucks-web                           "python3 app.py"         9 seconds ago       Up 6 seconds        0.0.0.0:5000->5000/tcp             foodtrucks_web_1
+05d408b25dfe        docker.elastic.co/elasticsearch/elasticsearch:6.3.2   "/usr/local/bin/dock…"   10 hours ago        Up 10 hours         0.0.0.0:9200->9200/tcp, 9300/tcp   es
+```
+
+现在，让我们来看看能否改变这个应用程序，使其在向 `/hello` 路由发出请求时显示 `Hello world!`。目前，应用程序的响应是 404。
+
+```bash
+$ curl -I 0.0.0.0:5000/hello
+HTTP/1.0 404 NOT FOUND
+Content-Type: text/html
+Content-Length: 233
+Server: Werkzeug/0.11.2 Python/2.7.15rc1
+Date: Mon, 30 Jul 2018 15:34:38 GMT
+```
+
+为什么会出现这种情况？由于我们的应用程序是 Flask 应用程序，我们可以查看 `app.py` 来寻找答案。在 Flask 中，路由是用 `@app.route` 语法定义的。在文件中，你会看到我们只定义了三个路由--`/`、`/debug` 和 `/search`。`/` 路由用于渲染主应用程序，`debug` 路由用于返回一些调试信息，最后，`search` 用于应用程序查询 elasticsearch。
+
+```bash
+$ curl 0.0.0.0:5000/debug
+{
+  "msg": "yellow open sfdata Ibkx7WYjSt-g8NZXOEtTMg 5 1 618 0 1.3mb 1.3mb\n",
+  "status": "success"
+}
+```
+
+在这种情况下，我们该如何为 `hello` 添加一条新路由呢？你猜对了！让我们用最喜欢的编辑器打开 `flask-app/app.py`，然后做如下修改：
+
+```python
+@app.route('/')
+def index():
+  return render_template("index.html")
+
+# add a new hello route
+@app.route('/hello')
+def hello():
+  return "hello world!"
+```
+
+让我们再次运行：
+
+```bash
+$ curl -I 0.0.0.0:5000/hello
+HTTP/1.0 404 NOT FOUND
+Content-Type: text/html
+Content-Length: 233
+Server: Werkzeug/0.11.2 Python/2.7.15rc1
+Date: Mon, 30 Jul 2018 15:34:38 GMT
+```
+
+哦，不，这不管用！我们做错了什么？虽然我们确实在 `app.py` 中做了更改，但该文件存在于我们的机器（或主机）中，但由于 Docker 是基于 `yourusername/foodtrucks-web` 镜像运行我们的容器，因此它并不知道这一更改。为了验证这一点，让我们试试下面的代码：
+
+```bash
+$ docker-compose run web bash
+Starting es ... done
+root@581e351c82b0:/opt/flask-app# ls
+app.py        package-lock.json  requirements.txt  templates
+node_modules  package.json       static            webpack.config.js
+root@581e351c82b0:/opt/flask-app# grep hello app.py
+root@581e351c82b0:/opt/flask-app# exit
+```
+
+在这里，我们要做的是验证我们所做的改动是否存在于容器中正在运行的 `app.py`。为此，我们运行了 `docker-compose run` 命令，该命令与 `docker run` 类似，但需要为服务（本例中为 [Web](https://github.com/prakhar1989/FoodTrucks/blob/master/docker-compose.yml#L12）提供额外参数。当我们运行 `bash` 命令时，shell 会在 `/opt/flask-app` 中打开，就像我们在 [Dockerfile](https://github.com/prakhar1989/FoodTrucks/blob/master/Dockerfile#L13) 中指定的那样。通过 `grep` 命令，我们可以看到文件中并没有我们所做的更改。
+
+让我们看看如何解决这个问题。首先，我们需要告诉 docker compose 不要使用镜像文件，而是使用本地文件。我们还要把调试模式设置为 `true`，这样当 `app.py` 发生变化时，Flask 就会知道要重新加载服务器。像这样替换 `docker-compose.yml` 文件中的 `web` 部分：
+
+```yaml {12-19}
+version: "3"
+services:
+  es:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.3.2
+    container_name: es
+    environment:
+      - discovery.type=single-node
+    ports:
+      - 9200:9200
+    volumes:
+      - esdata1:/usr/share/elasticsearch/data
+  web:
+    build: . # replaced image with build
+    command: python3 app.py
+    environment:
+      - DEBUG=True # set an env var for flask
+    depends_on:
+      - es
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./flask-app:/opt/flask-app
+volumes:
+  esdata1:
+    driver: local
+```
+
+有了这个变化（[diff](https://github.com/prakhar1989/FoodTrucks/commit/31368936de5959efaf4457a94c678d21e3eefbce)），让我们停止并启动容器。
+
+```bash
+$ docker-compose down -v
+Stopping foodtrucks_web_1 ... done
+Stopping es               ... done
+Removing foodtrucks_web_1 ... done
+Removing es               ... done
+Removing network foodtrucks_default
+Removing volume foodtrucks_esdata1
+
+$ docker-compose up -d
+Creating network "foodtrucks_default" with the default driver
+Creating volume "foodtrucks_esdata1" with local driver
+Creating es ... done
+Creating foodtrucks_web_1 ... done
+```
+
+最后一步，让我们在 `app.py` 中添加一个新路由。现在我们尝试使用 `curl` 访问 `http://0.0.0.0:5000/hello`。
+
+```bash
+$ curl 0.0.0.0:5000/hello
+hello world!
+```
+
+哇哦！我们得到了有效回应！请尝试在应用程序中进行更多更改。
+
+我们的 Docker Compose 之旅到此结束。有了 Docker Compose，你还可以暂停服务，在容器上运行一次性命令，甚至扩展容器的数量。我还建议你查看 Docker Compose 的其他一些 [使用案例](https://docs.docker.com/compose/#common-use-cases)。希望我已经向你展示了使用 Compose 管理多容器环境是多么容易。在最后一部分，我们将把应用程序部署到 AWS！
